@@ -1,3 +1,5 @@
+import kotlin.math.pow
+
 fun main(args: Array<String>)
 {
     println("Please input an input message")
@@ -5,28 +7,28 @@ fun main(args: Array<String>)
     var input = readLine()
     if (input != null)
     {
-        compress(input)
+        decompress(compress(input))
     }
 }
 
-fun compress(input: String)
+fun compress(input: String): MutableList<Int>
 {
     // Create dictionary and store all unicode-characters into it
-    val dictionary: MutableMap<UInt, String> = mutableMapOf<UInt, String>()
-    var nextDictionaryKey: UInt = 0u
+    val dictionary: MutableMap<Int, String> = mutableMapOf<Int, String>()
+    var nextDictionaryKey: Int = 0
     fun putValue(value: String)
     {
         dictionary[nextDictionaryKey] = value
         nextDictionaryKey++
     }
-    fun getKey(sequence: String): UInt = dictionary.keys.first { dictionary[it] == sequence }
+    fun getKey(sequence: String): Int = dictionary.keys.first { dictionary[it] == sequence }
 
     for (c in Char.MIN_VALUE..Char.MAX_VALUE)
         putValue(c.toString())
 
     // Make a copy of the input string, to be editable
     // Then compress the message using LZW-Compression
-    var result = mutableListOf<UInt>()
+    var result = mutableListOf<Int>()
     var workingString = input
 
     // Do the following while the message is not fully compressed
@@ -65,12 +67,58 @@ fun compress(input: String)
         }
     }
 
+    /*
     for (short in result)
     {
-        var s = Integer.toBinaryString(short.toInt())
-        for (i in 1..32-s.length)
-            s = "0$s"
-        println(s)
+        var s = toBinary(short, 16)
+        println("$s base 2 -> ${fromBinaryToInt(s)} base 10 -> ${toBinary(fromBinaryToInt(s), 16)}")
+    } */
+    return result
+}
+
+fun decompress(input: MutableList<Int>): String
+{
+    // Create dictionary and store all unicode-characters into it
+    val dictionary: MutableMap<Int, String> = mutableMapOf<Int, String>()
+    var nextDictionaryKey: Int = 0
+    fun putValue(value: String)
+    {
+        dictionary[nextDictionaryKey] = value
+        nextDictionaryKey++
     }
-    println(Integer.toBinaryString(-1))
+    fun getKey(sequence: String): Int = dictionary.keys.first { dictionary[it] == sequence }
+
+    for (c in Char.MIN_VALUE..Char.MAX_VALUE)
+        putValue(c.toString())
+
+
+    var message = dictionary[input[0]]
+    for (i in 1..input.size-1)
+    {
+        var r = dictionary[input[i]]
+        message += dictionary[input[i]]
+        putValue(dictionary[input[i-1]] + dictionary[input[i]]?.get(0))
+    }
+    print(message)
+    return message!!
+}
+
+fun toBinary(x: Int, len: Int): String
+{
+    return String.format(
+        "%" + len + "s",
+        Integer.toBinaryString(x)
+    ).replace(" ".toRegex(), "0")
+}
+
+fun fromBinaryToInt(binary: String): Int {
+    var num = 0
+    var i = 0
+    for (c in binary.reversed())
+    {
+        if (c == '1')
+            num += 2f.pow(i).toInt()
+        i++
+    }
+    return num
 }
