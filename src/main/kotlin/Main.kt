@@ -1,7 +1,32 @@
+import java.io.File
 import kotlin.math.pow
 
 fun main(args: Array<String>)
 {
+    var compressedData: MutableList<Int>
+    var uncompressedData: String
+
+    /*
+    if ("uncompress" in args)
+    {
+        if ("-r" in args)
+        {
+            val argInd = args.indexOf("-r") + 1
+            var compressedString = File(args[argInd]).readLines().fold("") {R, it -> R + it}
+            var compressedData = mutableListOf<Int>()
+
+        }
+    }
+    else if ("compress" in args)
+    {
+        if ("-r" in args)
+        {
+            val argInd = args.indexOf("-r") + 1
+            uncompressedData = File(args[argInd]).readLines().fold("") {R, it -> R + it}
+            compressedData = compress(uncompressedData)
+        }
+    }
+     */
     println("Please input an input message")
     println("UTF-8 format is supported")
     var input = readLine()
@@ -67,12 +92,11 @@ fun compress(input: String): MutableList<Int>
         }
     }
 
-    /*
     for (short in result)
     {
         var s = toBinary(short, 16)
         println("$s base 2 -> ${fromBinaryToInt(s)} base 10 -> ${toBinary(fromBinaryToInt(s), 16)}")
-    } */
+    }
     return result
 }
 
@@ -99,7 +123,7 @@ fun decompress(input: MutableList<Int>): String
         message += dictionary[input[i]]
         putValue(dictionary[input[i-1]] + dictionary[input[i]]?.get(0))
     }
-    print(message)
+    println("Decompressed message: \n $message")
     return message!!
 }
 
