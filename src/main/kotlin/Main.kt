@@ -61,11 +61,11 @@ fun compress(input: String): MutableList<Int>
     {
         // Iterate through left message char by char until a currently unknown sequence is found
         var currentSequence = workingString[0].toString()
-        println("message is \"$workingString\"\n")
+        //println("message is \"$workingString\"\n")
         if (workingString.length == 1)
         {
             result.add(getKey(workingString))
-            println("last key saved as \"${getKey(workingString)}\"")
+            //println("last key saved as \"${getKey(workingString)}\"")
             break
         }
 
@@ -73,19 +73,19 @@ fun compress(input: String): MutableList<Int>
         {
             // If the next sequence is known, continue iteration
             val nextPossibleSequence = currentSequence + workingString[currentCharIndex]
-            println("nextChar = ${workingString[currentCharIndex]}")
+            //println("nextChar = ${workingString[currentCharIndex]}")
             if (nextPossibleSequence in dictionary.values && currentSequence.length+1 != workingString.length)
             {
                 currentSequence = nextPossibleSequence
-                println("\"$currentSequence\" is known")
+                //println("\"$currentSequence\" is known")
             }
             // If the next sequence is not known or its the last sequence, save the current sequence and add the next sequence into the dictionary
             else
             {
                 result.add(getKey(currentSequence))
                 putValue(nextPossibleSequence)
-                println("\"$nextPossibleSequence\" is not known -> saved as \"${getKey(nextPossibleSequence)}\"")
-                println("encode \"$currentSequence\" as \"${getKey(currentSequence)}")
+                //println("\"$nextPossibleSequence\" is not known -> saved as \"${getKey(nextPossibleSequence)}\"")
+                //println("encode \"$currentSequence\" as \"${getKey(currentSequence)}")
                 workingString = workingString.replaceFirst(currentSequence, "")
                 break
             }
@@ -95,7 +95,7 @@ fun compress(input: String): MutableList<Int>
     for (short in result)
     {
         var s = toBinary(short, 16)
-        println("$s base 2 -> ${fromBinaryToInt(s)} base 10 -> ${toBinary(fromBinaryToInt(s), 16)}")
+        println("$short -> ${dictionary[short]}")
     }
     return result
 }
@@ -110,21 +110,27 @@ fun decompress(input: MutableList<Int>): String
         dictionary[nextDictionaryKey] = value
         nextDictionaryKey++
     }
-    fun getKey(sequence: String): Int = dictionary.keys.first { dictionary[it] == sequence }
 
     for (c in Char.MIN_VALUE..Char.MAX_VALUE)
+    {
         putValue(c.toString())
+    }
 
 
     var message = dictionary[input[0]]
-    for (i in 1..input.size-1)
+    for (i in 0 until input.size-1)
     {
-        var r = dictionary[input[i]]
-        message += dictionary[input[i]]
-        putValue(dictionary[input[i-1]] + dictionary[input[i]]?.get(0))
+        var j = if (input[i+1] in dictionary.keys) input[i+1] else input[i]
+        putValue(dictionary[input[i]] + dictionary[j]?.get(0))
+        message += dictionary[input[i+1]]
     }
     println("Decompressed message: \n $message")
     return message!!
+}
+
+fun dicMaxLen(dic: MutableMap<Int, String>, input: String, pos: Int)
+{
+    var maxLenWord = dic
 }
 
 fun toBinary(x: Int, len: Int): String
